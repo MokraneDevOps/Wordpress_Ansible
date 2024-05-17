@@ -4,3 +4,6 @@
 
 - name: "[WORDPRESS] - Install database"
   include_tasks: install_db.yml
+
+- name: "[WORDPRESS] - Install wordpress"
+  include_tasks: install_wordpress.yml
