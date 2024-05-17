@@ -1,0 +1,19 @@
+---
+
+# packages for LAMP
+packages_name:
+  - apache2
+  - mysql-server
+  - php
+  - php-mysql
+  - libapache2-mod-php
+  - python3-mysqldb
+  - wget
+services_name:
+  - apache2
+  - mysql
+
+#variables for mysql
+mysql_db: "wordpress"
+mysql_user: "user1"
+mysql_password: "Azerty123456"  
