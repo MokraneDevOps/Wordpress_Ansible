@@ -1,4 +1,3 @@
----
 - name: "[WORDPRESS] - Update cache"
   apt:
     update_cache: yes
@@ -13,11 +12,9 @@
 
 - name: "[WORDPRESS] - Install LAMP"
   apt:
-    name: "{{ item }}"
+    name: "{{ packages_name }}"
     state: present
   become: yes
-  with_items: "{{ packages_name }}"
-  ignore_errors: yes
 
 - name: "[WORDPRESS] - Start Apache2 and MySQL services"
   service:
@@ -25,8 +22,14 @@
     state: started
     enabled: yes
   become: yes
+  loop: 
+    - apache2
+    - mysql
+  register: service_result
 
 - name: "[WORDPRESS] - Display service status"
   debug:
-    msg: "The service {{ item.item }} is {{ item.state }}"
-  with_items: "{{ service_status.results }}"
+    msg: "The service {{ item }} is {{ service_result.results | selectattr('item', '==', item) | map(attribute='state') | first }}"
+  loop:
+    - apache2
+    - mysql

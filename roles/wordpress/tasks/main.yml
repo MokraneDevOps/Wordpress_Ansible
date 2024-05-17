@@ -1,5 +1,6 @@
 ---
 - name: "[WORDPRESS] - Install packages"
   include_tasks: install_packages.yml
+
 - name: "[WORDPRESS] - Install database"
   include_tasks: install_db.yml

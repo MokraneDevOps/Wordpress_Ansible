@@ -4,8 +4,11 @@
     name: "{{ mysql_db }}"
   become: yes
 
-- name: "[WORDPRESS]   - create user"
+- name: "[WORDPRESS] - Create MySQL User"
   mysql_user:
     name: "{{ mysql_user }}"
     password: "{{ mysql_password }}"
-    priv: "*.*.ALL"
+    priv: "{{ mysql_db }}.*:ALL"
+    host: "localhost"
+    state: present
+  no_log: true
