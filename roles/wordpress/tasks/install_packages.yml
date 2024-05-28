@@ -1,0 +1,35 @@
+- name: "[WORDPRESS] - Update cache"
+  apt:
+    update_cache: yes
+  become: yes
+
+- name: "[WORDPRESS] - Install apt-utils if missing"
+  apt:
+    name: apt-utils
+    state: present
+  become: yes
+  ignore_errors: yes
+
+- name: "[WORDPRESS] - Install LAMP"
+  apt:
+    name: "{{ packages_name }}"
+    state: present
+  become: yes
+
+- name: "[WORDPRESS] - Start Apache2 and MySQL services"
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  become: yes
+  loop: 
+    - apache2
+    - mysql
+  register: service_result
+
+- name: "[WORDPRESS] - Display service status"
+  debug:
+    msg: "The service {{ item }} is {{ service_result.results | selectattr('item', '==', item) | map(attribute='state') | first }}"
+  loop:
+    - apache2
+    - mysql

@@ -1,0 +1,41 @@
+---
+- name: "[WORDPRESS] - Check if WordPress directory exists"
+  stat:
+    path: "/var/www/html/wordpress/"
+  register: check_wordpress
+
+- name: "[WORDPRESS] - Download and extract WordPress tar.gz"
+  unarchive:
+    src: "{{ wordpress_source }}"
+    dest: "/var/www/html/"
+    remote_src: yes
+  when: not check_wordpress.stat.exists
+
+- name: "[WORDPRESS] - Remove index.html if it exists"
+  file:
+    path: /var/www/html/index.html
+    state: absent
+  become: yes
+
+- name: "[WORDPRESS] - Check if wp-config-sample.php exists"
+  stat:
+    path: "/var/www/html/wordpress/wp-config-sample.php"
+  register: check_sample
+
+- name: "[WORDPRESS] - Rename wp-config-sample.php to wp-config.php"
+  command: mv /var/www/html/wordpress/wp-config-sample.php /var/www/html/wordpress/wp-config.php
+  become: yes
+  when: check_sample.stat.exists
+
+- name: "[WORDPRESS] - Configure wp-config.php"
+  lineinfile:
+    path: "/var/www/html/wordpress/wp-config.php"
+    regexp: "{{ item.search }}"
+    line: "{{ item.new }}"
+    backrefs: yes
+  loop:
+    - { search: '^(.*)database_name_here(.*)$', new: "define('DB_NAME', '{{ mysql_db }}');" }
+    - { search: '^(.*)username_here(.*)$', new: "define('DB_USER', '{{ mysql_user }}');" }
+    - { search: '^(.*)password_here(.*)$', new: "define('DB_PASSWORD', '{{ mysql_password }}');" }
+  become: yes
+  when: check_sample.stat.exists
